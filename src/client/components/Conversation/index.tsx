@@ -288,7 +288,7 @@ const Conversation = () => {
                     alt="Boafo"
                     className="h-10"
                   />
-                  <div className="font-ddn font-semibold text-3xl text-main mt-[5px]">
+                  <div className="font-ddn font-semibold text-2xl md:text-3xl text-main mt-[5px]">
                     Boafo Consult
                   </div>
                 </div>
