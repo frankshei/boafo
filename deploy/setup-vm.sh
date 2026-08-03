@@ -7,16 +7,35 @@ APP_DIR="/opt/boafo"
 ENV_DIR="/etc/boafo"
 BRANCH="main"
 
-# ── System packages ─────────────────────────────────────────────────
+# ── Swap (prevent OOM during npm ci / vite build on 1GB RAM) ────────
+if [ ! -f /swapfile ]; then
+  sudo fallocate -l 2G /swapfile
+  sudo chmod 600 /swapfile
+  sudo mkswap /swapfile
+  sudo swapon /swapfile
+  echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+  sudo sysctl vm.swappiness=10
+fi
+
+# ── System packages (Ubuntu 24.04: several libs have the t64 suffix) ─
 sudo apt-get update
-sudo apt-get install -y curl git nginx postgresql-client \
-  libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxkbcommon0 \
+sudo apt-get install -y curl ca-certificates git nginx postgresql-client \
+  libatk1.0-0t64 libatk-bridge2.0-0t64 libcups2t64 libdrm2 libxkbcommon0 \
   libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 \
-  libpango-1.0-0 libcairo2 libasound2 libnspr4 libnss3
+  libpango-1.0-0 libcairo2 libasound2t64 libnspr4 libnss3
 
 # ── Node.js 20 ──────────────────────────────────────────────────────
 curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 sudo apt-get install -y nodejs
+
+# ── PGDG repo (PostgreSQL 18 is not in Ubuntu 24.04 default repos) ───
+. /etc/os-release
+sudo install -d /usr/share/postgresql-common/pgdg
+sudo curl -fsSL -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc \
+  https://www.postgresql.org/media/keys/ACCC4CF8.asc
+echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt ${VERSION_CODENAME}-pgdg main" \
+  | sudo tee /etc/apt/sources.list.d/pgdg.list
+sudo apt-get update
 
 # ── PostgreSQL 18 + pgvector ────────────────────────────────────────
 sudo apt-get install -y postgresql-18 postgresql-server-dev-18 build-essential
@@ -57,6 +76,9 @@ sudo rm -rf "$APP_DIR"
 sudo git clone --branch "$BRANCH" "$REPO_URL" "$APP_DIR"
 cd "$APP_DIR"
 sudo npm ci
+
+# ── Puppeteer Chrome for the PM2 user (PDF generation) ──────────────
+sudo -u "$(whoami)" npx puppeteer browsers install chrome
 
 # ── Environment file ────────────────────────────────────────────────
 sudo mkdir -p "$ENV_DIR"

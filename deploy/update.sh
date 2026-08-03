@@ -3,7 +3,7 @@ set -euo pipefail
 
 APP_DIR="/opt/boafo"
 ENV_FILE="/etc/boafo/.env"
-PM2_USER="fahdsheikh"
+PM2_USER="fsheikh"
 
 cd "$APP_DIR"
 
