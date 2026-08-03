@@ -265,19 +265,20 @@ const Conversation = () => {
 
   return (
     <div className="h-screen bg-body flex overflow-hidden">
-      <div className="relative shrink-0 pt-6 pl-6 z-10">
-        <a href="https://kasamd.com" target="_blank" rel="noopener noreferrer">
-          <img
-            src="/icons/themed/kasamd_green.png"
-            alt="KasaMD"
-            className="h-8"
-          />
-        </a>
-      </div>
       <div className="flex flex-col flex-1 min-w-0">
         {/* Messages area */}
         <div className="flex-1 overflow-y-auto">
           <div className="max-w-2xl mx-auto py-4 px-4 md:px-0">
+            {/* KasaMD logo: stacks above the Boafo header on mobile, pinned to the corner on desktop */}
+            <div className="mb-4 md:mb-0 md:fixed md:top-6 md:left-6 md:z-10">
+              <a href="https://kasamd.com" target="_blank" rel="noopener noreferrer">
+                <img
+                  src="/icons/themed/kasamd_green.png"
+                  alt="KasaMD"
+                  className="h-8"
+                />
+              </a>
+            </div>
             {/* Header */}
             <div className="flex items-center justify-between pt-4 pb-2">
               <div>

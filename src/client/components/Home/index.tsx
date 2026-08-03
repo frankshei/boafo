@@ -85,16 +85,16 @@ const Home = () => {
 
   return (
     <div className="h-screen bg-body">
-      <div className="relative pt-6 pl-6 z-10">
-        <a href="https://kasamd.com" target="_blank" rel="noopener noreferrer">
-          <img
-            src="/icons/themed/kasamd_green.png"
-            alt="KasaMD"
-            className="h-8"
-          />
-        </a>
-      </div>
       <div className="max-w-lg m-auto py-40 flex flex-col">
+        <div className="mb-4 md:mb-0 md:fixed md:top-6 md:left-6 md:z-10">
+          <a href="https://kasamd.com" target="_blank" rel="noopener noreferrer">
+            <img
+              src="/icons/themed/kasamd_green.png"
+              alt="KasaMD"
+              className="h-8"
+            />
+          </a>
+        </div>
         <div className="mb-2">
           <div className="flex items-center gap-3 mb-2">
             <img
