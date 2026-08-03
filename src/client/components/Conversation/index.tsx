@@ -265,7 +265,7 @@ const Conversation = () => {
 
   return (
     <div className="h-screen bg-body flex overflow-hidden">
-      <div className="fixed top-6 left-6 z-10">
+      <div className="relative shrink-0 pt-6 pl-6 z-10">
         <a href="https://kasamd.com" target="_blank" rel="noopener noreferrer">
           <img
             src="/icons/themed/kasamd_green.png"
@@ -277,7 +277,7 @@ const Conversation = () => {
       <div className="flex flex-col flex-1 min-w-0">
         {/* Messages area */}
         <div className="flex-1 overflow-y-auto">
-          <div className="max-w-2xl mx-auto py-4">
+          <div className="max-w-2xl mx-auto py-4 px-4 md:px-0">
             {/* Header */}
             <div className="flex items-center justify-between pt-4 pb-2">
               <div>
@@ -433,7 +433,7 @@ const Conversation = () => {
 
         {/* Input area */}
         {!completed && (
-          <div className="shrink-0 bg-body pb-4 max-w-2xl w-full mx-auto">
+          <div className="shrink-0 bg-body pb-4 max-w-2xl w-full mx-auto px-4 md:px-0">
             <div className="bg-white p-2 rounded-lg shadow-sm border-gray-200">
               <div className="flex justify-between items-center mb-2 px-1">
                 {language && language !== "en" && (
