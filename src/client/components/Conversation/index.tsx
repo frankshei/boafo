@@ -109,6 +109,7 @@ const Conversation = () => {
       // onError
       (errorMsg) => {
         setStreaming(false);
+        setAssessmentLoading(false);
         setMessages((prev) => {
           const last = prev[prev.length - 1];
           if (last?.role === "assistant") {

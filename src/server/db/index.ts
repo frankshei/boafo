@@ -6,9 +6,9 @@ const pool = new pg.Pool({
   database: process.env.DATABASE ?? "cb",
   user: process.env.PG_USER ?? "postgres",
   password: process.env.PG_PASSWORD ?? "",
-  max: 5,
+  max: 10,
   idleTimeoutMillis: 30_000,
-  connectionTimeoutMillis: 5_000,
+  connectionTimeoutMillis: 10_000,
   ...(process.env.PG_SSL === "true" ? { ssl: { rejectUnauthorized: true } } : {}),
 });
 

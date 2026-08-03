@@ -135,6 +135,28 @@ const searchGuidelines = async (
   return results;
 };
 
+// Cap concurrent guideline searches below the pg pool size (db max: 10) so a
+// large differential fan-out can't exhaust the connection pool.
+const GUIDELINE_SEARCH_CONCURRENCY = 6;
+
+async function mapWithConcurrency<T>(
+  tasks: Array<() => Promise<T>>,
+  concurrency: number,
+): Promise<T[]> {
+  const results = new Array<T>(tasks.length);
+  let next = 0;
+  const worker = async () => {
+    while (next < tasks.length) {
+      const i = next++;
+      results[i] = await tasks[i]();
+    }
+  };
+  await Promise.all(
+    Array.from({ length: Math.min(concurrency, tasks.length) }, worker),
+  );
+  return results;
+};
+
 const searchGuidelinesAll = async (
   diagnoses: { condition: string }[],
   findings: Finding[],
@@ -152,13 +174,15 @@ const searchGuidelinesAll = async (
   // Single batched embedding call for all texts
   const allEmbeddings = await embedBatch(queryTexts);
 
-  // Run all DB searches in parallel
-  const searchPromises: Promise<any[]>[] = [];
+  // Run DB searches with bounded concurrency. An unbounded Promise.all here
+  // fanned out 2 queries per diagnosis into a 5-connection pool, starving it and
+  // causing "timeout exceeded when trying to connect" -> hung assessments.
+  const searchTasks: Array<() => Promise<any[]>> = [];
   for (let i = 0; i < diagnoses.length; i++) {
-    searchPromises.push(searchGuidelineChunksQuery(allEmbeddings[i * 2], limit));
-    searchPromises.push(searchGuidelineChunksQuery(allEmbeddings[i * 2 + 1], limit));
+    searchTasks.push(() => searchGuidelineChunksQuery(allEmbeddings[i * 2], limit));
+    searchTasks.push(() => searchGuidelineChunksQuery(allEmbeddings[i * 2 + 1], limit));
   }
-  const allChunks = await Promise.all(searchPromises);
+  const allChunks = await mapWithConcurrency(searchTasks, GUIDELINE_SEARCH_CONCURRENCY);
 
   // Process results per diagnosis (same dedupe/rerank logic as searchGuidelines)
   const findingTerms = findings.map((f) => f.value.toLowerCase());
